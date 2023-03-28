@@ -16,7 +16,7 @@ MonoBehaviour:
   author: eXish
   description: "Figure out which control to use on the TV and when based on a magic
     eye stereogram. You can also play some TV programming on it.\n\r\nHTML: https://ktane.timwi.de/HTML/TV.html\r\nPDF:
-    https://ktane.timwi.de/PDF/TV.pdf\r\n\r\nTV (TV) v1.6.0\nModule by BakersDozenBagels,
+    https://ktane.timwi.de/PDF/TV.pdf\r\n\r\nTV (TV) v1.6.0\nModule by Anonymous,
     maintained by eXish\r\nTwitch Plays supported"
   version: 1.6.0
   outputFolder: build
