@@ -25,7 +25,7 @@ public class TVScript : MonoBehaviour
     private float volume = 0.1f;
 
     private static VideoClip[] clips = new VideoClip[0];
-    private int currentClip = 1;
+    private int currentClip = 0;
 
     private bool _solved = false;
 
@@ -61,6 +61,8 @@ public class TVScript : MonoBehaviour
         {
             mainTexture = Rig.Camera.targetTexture
         };
+        //camera.fieldOfView *= transform.lossyScale.x;
+        //camera.farClipPlane *= transform.lossyScale.y;
         Player.clip = clips[1];
         Player.SetTargetAudioSource(0, Source1.AudioSource);
         Player.SetTargetAudioSource(1, Source2.AudioSource);
@@ -108,8 +110,6 @@ public class TVScript : MonoBehaviour
             Debug.LogFormat("[TV #{0}] Correct! Solved.", _id);
             Module.HandlePass();
             _solved = true;
-            if (TwitchPlaysActive && screenMode > 1)
-                Power();
         }
         else
         {
@@ -209,13 +209,16 @@ public class TVScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private string TwitchHelpMessage = "Use '!{0} power' to turn the TV on or off. Use '!{0} brightness even' to press brightness on an even digit. If the gods have given you special powers, use '!{0} volume' to press volume or '!{0} channel' to press the channel switch.";
+    private string TwitchHelpMessage = "Use '!{0} power' to turn the TV on. '!{0} brightness even' to press brightness on an even digit.";
 #pragma warning restore 414
-
-    private bool TwitchPlaysActive;
 
     IEnumerator ProcessTwitchCommand(string command)
     {
+        volume = 0f;
+        Source1.Volume = volume;
+        Source2.Volume = volume;
+        SourceStatic.Volume = volume;
+
         command = command.Trim().ToLowerInvariant();
         Match m;
 
@@ -240,29 +243,19 @@ public class TVScript : MonoBehaviour
             button.OnInteract();
         }
         if(Regex.IsMatch(command, "(?:press )?volume"))
-        {
-            yield return null;
-            yield return "antitroll Volume is inaccessible due to concerns over people's hearing.";
-            buttonVol.OnInteract();
-            yield break;
-        }
+            yield return "sentochaterror Volume is inaccessible due to concerns over people's hearing.";
         if(Regex.IsMatch(command, "(?:press )?channel"))
-        {
-            yield return null;
-            yield return "antitroll Channel is inaccessible due to concerns over copyright.";
-            buttonChn.OnInteract();
-            yield break;
-        }
+            yield return "sentochaterror Channel is inaccessible due to concerns over copyright.";
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        int solDir = spinMode == 1 ? (dirMode + 2) % 4 : dirMode % 4;
+        int solDir = spinMode == 1 ? dirMode + 2 % 4 : dirMode;
         if(solDir == 0 || solDir == 3)
-            while (Mathf.FloorToInt(Info.GetTime()) % 2 != 0) yield return true;
+            yield return new WaitUntil(() => Mathf.FloorToInt(Info.GetTime()) % 2 == 0);
         else
-            while (Mathf.FloorToInt(Info.GetTime()) % 2 != 1) yield return true;
-        if(solDir == 1 || solDir == 3)
+            yield return new WaitUntil(() => Mathf.FloorToInt(Info.GetTime()) % 2 == 1);
+        if(spinMode % 2 == 0)
             buttonBrg.OnInteract();
         else
             buttonCon.OnInteract();
