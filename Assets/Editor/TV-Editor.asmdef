@@ -1,0 +1,10 @@
+{
+  "name": "TV-Editor",
+  "references": [
+    "TV"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
